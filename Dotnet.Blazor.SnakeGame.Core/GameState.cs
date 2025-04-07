@@ -12,6 +12,8 @@ namespace Dotnet.Blazor.SnakeGame.Core
         public int Level { get; private set; } = 1;
         public int Speed { get; private set; } = 500;
 
+        public bool IsGamePaused { get; set; } = false;
+
         private readonly Random _random = new Random();
         private readonly LinkedList<Position> _snakeCoordinates = new LinkedList<Position>();
 
@@ -36,6 +38,11 @@ namespace Dotnet.Blazor.SnakeGame.Core
             {
                 Dir = direction;
             }
+        }
+
+        public void PauseResumeGame()
+        {
+            IsGamePaused = !IsGamePaused;
         }
 
         public void Move()
