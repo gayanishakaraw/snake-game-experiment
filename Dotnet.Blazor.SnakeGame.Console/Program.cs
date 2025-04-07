@@ -5,8 +5,6 @@ bool isGameOver = false;
 bool isGameStarted = false;
 int rows = 20;
 int cols = 20;
-int foodRefreshSpeed = 5000;
-int snakeSpeed = 500;
 
 Random _random = new Random();
 int randomRow = _random.Next(0, rows);
@@ -22,7 +20,7 @@ while (!isGameOver && true)
 
     Console.Clear();
     Console.WriteLine($"Score : {score}");
-    Console.WriteLine($"Snake Level : {gameState.Level}");
+    Console.WriteLine($"Level : {gameState.Level}");
     gameState.Move();
 
     int canvasRows = gameState.Rows;
@@ -89,4 +87,4 @@ while (!isGameOver && true)
 }
 
 Console.WriteLine();
-Console.WriteLine("Game Over");
+Console.WriteLine("Game Over!");

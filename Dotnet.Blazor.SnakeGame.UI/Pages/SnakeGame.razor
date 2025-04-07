@@ -1,6 +1,4 @@
 @page "/snake-game"
-@using Dotnet.Blazor.SnakeGame.Core
-@inject Dotnet.Blazor.SnakeGame.Core.GamePlay GamePlay
 
 <PageTitle>Snake Game</PageTitle>
 
@@ -10,84 +8,12 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
-@* <div class="game-board">
-    @for (int y = 0; y < rows; y++)
-    {
-        <div class="row">
-            @for (int x = 0; x < cols; x++)
-            {
-                var cellClass = GetCellClass(x, y);
-                <div class="cell @cellClass"></div>
-            }
-        </div>
-    }
-</div> *@
-
-@* <div class="controls">
-    <button @onclick="StartGame">Start</button>
-    <button @onclick="PauseGame">Pause</button>
-    <button @onclick="ResetGame">Reset</button>
-    <label>Speed:
-        <input type="range" min="50" max="500" @bind="speed" />
-    </label>
-</div> *@
-
-@* <style>
-    .game-board {
-        display: grid;
-        grid-template-columns: repeat(20, 20px);
-        grid-template-rows: repeat(20, 20px);
-    }
-
-    .cell {
-        width: 20px;
-        height: 20px;
-        border: 1px solid #ccc;
-    }
-
-    .snake {
-        background-color: green;
-    }
-
-    .food {
-        background-color: red;
-    }
-</style> *@
-
 
 @code {
     private int score = 0;
 
-    @* private GamePlay gamePlay = new GamePlay(50, 50);
-    private int rows => gamePlay.Rows;
-    private int cols => gamePlay.Cols; 
-    private int speed = 100; *@
-
-    private string GetCellClass(int x, int y)
-    {
-        @* if (gameState.(x, y))
-            return "snake";
-        if (gameState.IsFood(x, y))
-            return "food"; *@
-        return "";
-    }
-
     private void IncrementCount()
     {
         score++;
-    }
-
-    private void StartGame()
-    {
-        // Logic to start the game
-    }
-    private void PauseGame()
-    {
-        // Logic to pause the game
-    }
-    private void ResetGame()
-    {
-        // Logic to reset the game
-        score = 0;
     }
 }
