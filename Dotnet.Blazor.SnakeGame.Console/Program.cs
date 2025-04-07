@@ -1,15 +1,8 @@
-﻿using System;
-using Dotnet.Blazor.SnakeGame.Core;
+﻿using Dotnet.Blazor.SnakeGame.Core;
 
 bool isGameOver = false;
-bool isGameStarted = false;
-bool isGamePaused = false;
 int rows = 20;
 int cols = 20;
-
-Random _random = new Random();
-int randomRow = _random.Next(0, rows);
-int randomCol = _random.Next(0, cols);
 
 GameState gameState = new GameState(rows, cols);
 isGameOver = gameState.IsGameOver;

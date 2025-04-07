@@ -16,8 +16,9 @@ namespace Dotnet.Blazor.SnakeGame.Core
 
         private readonly Random _random = new Random();
         private readonly LinkedList<Position> _snakeCoordinates = new LinkedList<Position>();
-
-        public GameState(int rows, int columns)
+        private readonly LinkedList<Direction> _directions = new LinkedList<Direction>();
+        
+        public GameState(int rows = 20, int columns = 20)
         {
             Rows = rows;
             Columns = columns;
@@ -34,10 +35,30 @@ namespace Dotnet.Blazor.SnakeGame.Core
 
         public void ChangeDirection(Direction direction)
         {
-            if (Dir.Opposite() != direction)
+            if (CanChangeDirection(direction))
             {
+                _directions.AddLast(direction);
                 Dir = direction;
             }
+        }
+        private Direction GetLastDirection()
+        {
+            if (_directions.Count == 0)
+            {
+                return Dir;
+            }
+            return _directions.Last.Value;
+        }
+
+        private bool CanChangeDirection(Direction direction)
+        {
+            if (_directions.Count == 2)
+            {
+                return true;
+            }
+            
+            Direction lastDirection = GetLastDirection();
+            return direction != lastDirection && direction != lastDirection.Opposite();
         }
 
         public void PauseResumeGame()
@@ -47,8 +68,15 @@ namespace Dotnet.Blazor.SnakeGame.Core
 
         public void Move()
         {
+            if(_directions.Count > 0)
+            {
+                Dir = _directions.First.Value;
+                _directions.RemoveFirst();
+            }
+
             Position head = Head?.Translate(Dir);
             GridView hit = WillHitOn(head);
+            IsGameStarted = true;
 
             Level = Score switch
             {

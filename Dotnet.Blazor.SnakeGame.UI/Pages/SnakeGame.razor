@@ -1,19 +1,146 @@
-@page "/snake-game"
+﻿@page "/snake-game"
+@implements IDisposable
 
 <PageTitle>Snake Game</PageTitle>
 
 <h1>Snake Game</h1>
 
-<p role="status">Score: @score</p>
+<p role="score">Score: @gameState.Score</p>
+<p role="level">Level: @gameState.Level</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+@if (gameState.IsGamePaused)
+{
+    <p role="paused">Game Paused! Press Space to Resume.</p>
+}
 
+@if (gameState.IsGameOver)
+{
+    <p role="game-over">Game Over!</p>
+}
+
+@if (!gameState.IsGameStarted)
+{
+    <button class="btn btn-primary" @onclick="RunGameLoop">Start</button>
+}
+
+@if (gameState.IsGameOver)
+{
+    <button class="btn btn-primary" @onclick="StartANewGame">Start A New Game</button>
+}
+
+@if (gameState.IsGameStarted && !gameState.IsGameOver)
+{
+    <button class="btn btn-secondary" @onclick="PauseAndResumeGame">
+        @if (gameState.IsGamePaused) 
+        {
+            <span>Resume</span>
+        }
+        else
+        {
+            <span>Pause</span>
+        }
+    </button>
+}
+
+<div class="game-canvas">
+@for (int i = 0; i < gameState.Rows; i++)
+{
+    <div class="row">
+        @for (int j = 0; j < gameState.Columns; j++)
+        {
+            @if (gameState.GameCanvas[i, j] == GridView.Snake)
+            {
+                <div class="cell snake"></div>
+            }
+            else if (gameState.GameCanvas[i, j] == GridView.Food)
+            {
+                <div class="cell food"></div>
+            }
+            else if (gameState.GameCanvas[i, j] == GridView.Wall)
+            {
+                <div class="cell wall"></div>
+            }
+            else
+            {
+                <div class="cell empty"></div>
+            }
+        }
+    </div>
+}
+</div>
 
 @code {
-    private int score = 0;
 
-    private void IncrementCount()
+    [Inject]
+    private IJSRuntime JS { get; set; } = default!;
+
+    [Inject] 
+    NavigationManager Nav { get; set; }
+
+    static int rows = 20;
+    static int cols = 20;
+    static GameState gameState = new GameState(rows, cols);
+    private DotNetObjectReference<SnakeGame>? selfReference;
+    static bool isGameOver = gameState.IsGameOver;
+
+    private void StartANewGame()
     {
-        score++;
+        Nav.NavigateTo(Nav.Uri, forceLoad: true);
+    }
+
+    private async Task RunGameLoop()
+    {
+        while (!gameState.IsGameOver)
+        {
+            if (!gameState.IsGamePaused)
+            {
+                gameState.Move();
+                StateHasChanged();
+            }
+            await Task.Delay(gameState.Speed);
+        }
+    }
+
+    private void PauseAndResumeGame()
+    {
+        gameState.PauseResumeGame();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            selfReference = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("keyCapture.registerKeyHandler", selfReference);
+        }
+    }
+
+    [JSInvokable]
+    public void OnKeyDown(string key)
+    {
+        switch (key)
+        {
+            case "ArrowUp":
+                gameState.ChangeDirection(Direction.Up);
+                break;
+            case "ArrowDown":
+                gameState.ChangeDirection(Direction.Down);
+                break;
+            case "ArrowLeft":
+                gameState.ChangeDirection(Direction.Left);
+                break;
+            case "ArrowRight":
+                gameState.ChangeDirection(Direction.Right);
+                break;
+            case " ":
+                gameState.PauseResumeGame();
+                break;
+        }
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        selfReference?.Dispose();
     }
 }
